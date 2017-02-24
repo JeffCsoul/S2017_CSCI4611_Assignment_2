@@ -6,18 +6,32 @@ using glm::vec2;
 using glm::vec3;
 using glm::vec4;
 
+#define PI 3.1415927
+
 class Car {
 public:
     vec3 position;
     vec3 velocity;
+    float rotate_angle;
     float collisionRadius;
-    float thrustFactor, dragFactor;
+    float thrustFactor, dragFactor, rotateRate;
     void draw() {
         glColor3f(0.8,0.2,0.2);
         // Replace the following with a more car-like geometry
-        glPointSize(5);
-        glBegin(GL_POINTS);
-        glVertex3f(position.x,position.y,position.z);
+        glPushMatrix();
+        glTranslatef(position.x,position.y,position.z);
+        glTranslatef(1.5,
+                     0,
+                     4);
+        glRotatef(rotate_angle, 0, 1, 0);
+        glTranslatef(-1.5,
+                     0,
+                     -4);
+        // glTranslatef(position.x,position.y,position.z);
+        glScalef(3, 2, 4);
+        Draw::unitCube();
+        // glVertex3f(position.x,position.y,position.z);
+        glPopMatrix();
         glEnd();
     }
 };
@@ -32,7 +46,9 @@ public:
         car.collisionRadius = 2.5;
         car.position = vec3(0, 1, 45); // center of car is 1 m above ground
         car.velocity = vec3(0, 0, 0);
-        car.thrustFactor = 150;
+        car.rotate_angle = 0.0;
+        car.thrustFactor = 300;
+        car.rotateRate = 180;
         car.dragFactor = 5;
     }
 
@@ -53,9 +69,17 @@ public:
     void simulate(float timeStep) {
         // An oversimplified dynamics model for the car
         vec2 dir = getControlDirection();
+        if (dir.y == 0) {
+          car.velocity = vec3(0, 0, 0);
+          // return;
+        }
         if (glm::length(dir) > 0)
             dir = glm::normalize(dir);
-        vec3 thrust = car.thrustFactor*vec3(dir.x, 0, -dir.y);
+        car.rotate_angle += -dir.x * car.rotateRate * timeStep;
+        vec3 thrust = car.thrustFactor *
+                      vec3(-dir.y * sin(car.rotate_angle * PI / 180),
+                           0,
+                           -dir.y * cos(car.rotate_angle * PI / 180));
         vec3 drag = car.dragFactor*car.velocity;
         car.velocity += (thrust - drag)*timeStep;
         car.position += car.velocity*timeStep;
@@ -82,7 +106,7 @@ public:
         glLightfv(light, GL_POSITION, &position[0]);
         glLightfv(light, GL_DIFFUSE, &color[0]);
     }
-    
+
     void drawGraphics() {
         // Allow lines to show up on top of filled polygons
         glEnable(GL_POLYGON_OFFSET_FILL);
@@ -114,7 +138,7 @@ public:
         glEnd();
         // Draw the car
         car.draw();
-        
+
         glDisable(GL_LIGHTING);
         // Draw the field borders, the pitch markings, and the goals here
         glEnable(GL_LIGHTING);
