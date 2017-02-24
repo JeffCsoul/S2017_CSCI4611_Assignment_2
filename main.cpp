@@ -12,21 +12,21 @@ class Car {
 public:
     vec3 position;
     vec3 velocity;
-    float rotate_angle;
+    float rotateRate;
     float collisionRadius;
-    float thrustFactor, dragFactor, rotateRate;
+    float thrustFactor, dragFactor, rotateFactor;
     void draw() {
         glColor3f(0.8,0.2,0.2);
         // Replace the following with a more car-like geometry
         glPushMatrix();
         glTranslatef(position.x,position.y,position.z);
-        glTranslatef(1.5,
+        glTranslatef(0,
                      0,
-                     4);
-        glRotatef(rotate_angle, 0, 1, 0);
-        glTranslatef(-1.5,
+                     2);
+        glRotatef(rotateRate, 0, 1, 0);
+        glTranslatef(0,
                      0,
-                     -4);
+                     -2);
         // glTranslatef(position.x,position.y,position.z);
         glScalef(3, 2, 4);
         Draw::unitCube();
@@ -34,6 +34,13 @@ public:
         glPopMatrix();
         glEnd();
     }
+};
+
+class Ball {
+ public:
+   vec3 position;
+   vec3 velocity;
+
 };
 
 class CarSoccer: public Engine {
@@ -46,9 +53,9 @@ public:
         car.collisionRadius = 2.5;
         car.position = vec3(0, 1, 45); // center of car is 1 m above ground
         car.velocity = vec3(0, 0, 0);
-        car.rotate_angle = 0.0;
+        car.rotateRate = 0.0;
         car.thrustFactor = 300;
-        car.rotateRate = 180;
+        car.rotateFactor = 180;
         car.dragFactor = 5;
     }
 
@@ -75,11 +82,11 @@ public:
         }
         if (glm::length(dir) > 0)
             dir = glm::normalize(dir);
-        car.rotate_angle += -dir.x * car.rotateRate * timeStep;
+        car.rotateRate += -dir.x * car.rotateFactor * timeStep;
         vec3 thrust = car.thrustFactor *
-                      vec3(-dir.y * sin(car.rotate_angle * PI / 180),
+                      vec3(-dir.y * sin(car.rotateRate * PI / 180),
                            0,
-                           -dir.y * cos(car.rotate_angle * PI / 180));
+                           -dir.y * cos(car.rotateRate * PI / 180));
         vec3 drag = car.dragFactor*car.velocity;
         car.velocity += (thrust - drag)*timeStep;
         car.position += car.velocity*timeStep;
