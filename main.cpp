@@ -34,6 +34,7 @@ class Ball {
    vec3 velocity;
    vec3 gravity;
    float collisionRadius;
+   float dragFactor;
    void draw() {
      glColor3f(1,1,1);
      glPushMatrix();
@@ -62,10 +63,11 @@ public:
         car.dragFactor = 5;
 
         srand((unsigned)time(0));
-        ball.position = vec3(0, 2, 0);
+        ball.position = vec3(0, 20, 0);
         ball.velocity = vec3(0, 0, 0);
-        ball.gravity = vec3(0, -9.8, 0);
+        ball.gravity = vec3(0, -200, 0);
         ball.collisionRadius = 2;
+        ball.dragFactor = 0.5;
     }
 
     ~CarSoccer() {
@@ -119,7 +121,42 @@ public:
           }
         }
         // Handle ball/wall, car/wall, and ball/car collisions here
+        // ground
+        if (ball.position.y <= 0 + ball.collisionRadius) {
+          // hit ground
+          ball.velocity.y = fabs(ball.velocity.y);
+        }
+        if (ball.position.y >= 35 - ball.collisionRadius) {
+          // hit the upper wall
+          ball.velocity.y = -fabs(ball.velocity.y);
+        }
+        if (ball.position.x <= -40 + ball.collisionRadius) {
+          // hit the right wall
+          ball.velocity.x *= fabs(ball.velocity.x);
+        }
+        if (ball.position.x >= 40 - ball.collisionRadius) {
+          // hit the left wall
+          ball.velocity.x *= -fabs(ball.velocity.x);
+        }
+        if (ball.position.z <= -50 + ball.collisionRadius) {
+          ball.velocity.z *= fabs(ball.velocity.z);
+        }
+        if (ball.position.z >= 50 - ball.collisionRadius) {
+          ball.velocity.z *= -fabs(ball.velocity.z);
+        }
 
+        // calculate out the position after this dt
+        vec3 drag = ball.dragFactor * ball.velocity;
+        ball.velocity += (ball.gravity - drag) * timeStep;
+        if (ball.position.y <= 0 + ball.collisionRadius) {
+          // hit ground
+          ball.velocity.y = fabs(ball.velocity.y);
+        }
+        if (ball.position.y >= 35 - ball.collisionRadius) {
+          // hit the upper wall
+          ball.velocity.y = -fabs(ball.velocity.y);
+        }
+        ball.position += ball.velocity * timeStep;
     }
 
     vec2 getControlDirection() {
