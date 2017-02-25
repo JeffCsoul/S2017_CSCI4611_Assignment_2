@@ -73,7 +73,7 @@ namespace Draw {
 
     inline void unitSphere() {
         static GLUquadric* quadric = gluNewQuadric();
-        gluSphere(quadric, 1, 40, 40);
+        gluSphere(quadric, 2, 40, 40);
     }
 
     void circleXZ(float r) {
@@ -83,6 +83,17 @@ namespace Draw {
             glVertex3f(r*cos(t),0,r*sin(t));
         }
         glEnd();
+    }
+
+    void circleXZShadow(float r, vec3 center) {
+      glColor3f(0.15,0.15,0.15);
+      glBegin(GL_TRIANGLE_FAN);
+      glVertex3f(center.x, 0.1, center.z);
+      for (int i = 0; i <= 30; i++) {
+          float t = 2*M_PI*i/30;
+          glVertex3f(center.x + r*cos(t), 0.1 , center.z + r*sin(t));
+      }
+      glEnd();
     }
 }
 

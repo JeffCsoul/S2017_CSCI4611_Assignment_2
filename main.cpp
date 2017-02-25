@@ -1,12 +1,12 @@
 #include "engine.hpp"
 #include "draw.hpp"
 #include <glm/glm.hpp>
+#include <ctime>
+
 using namespace std;
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
-
-#define PI 3.1415927
 
 class Car {
 public:
@@ -32,12 +32,17 @@ class Ball {
  public:
    vec3 position;
    vec3 velocity;
-
+   vec3 gravity;
+   float collisionRadius;
    void draw() {
      glColor3f(1,1,1);
      glPushMatrix();
      glTranslatef(position.x, position.y,position.z);
+     Draw::unitSphere();
      glPopMatrix();
+
+     Draw::circleXZShadow(2, position);
+
    }
 };
 
@@ -45,7 +50,7 @@ class CarSoccer: public Engine {
 public:
     SDL_Window *window;
     Car car;
-
+    Ball ball;
     CarSoccer() {
         window = createWindow("Car Soccer", 1280, 720);
         car.collisionRadius = 2.5;
@@ -55,6 +60,12 @@ public:
         car.thrustFactor = 250;
         car.rotateFactor = 210;
         car.dragFactor = 5;
+
+        srand((unsigned)time(0));
+        ball.position = vec3(0, 2, 0);
+        ball.velocity = vec3(0, 0, 0);
+        ball.gravity = vec3(0, -9.8, 0);
+        ball.collisionRadius = 2;
     }
 
     ~CarSoccer() {
@@ -91,9 +102,9 @@ public:
           dir = glm::normalize(dir);
           car.rotateRate += -dir.x * car.rotateFactor * timeStep;
           vec3 thrust = car.thrustFactor *
-          vec3(-dir.y * sin(car.rotateRate * PI / 180),
+          vec3(-dir.y * sin(car.rotateRate * M_PI / 180),
           0,
-          -dir.y * cos(car.rotateRate * PI / 180));
+          -dir.y * cos(car.rotateRate * M_PI / 180));
           vec3 drag = car.dragFactor*car.velocity;
           car.velocity += (thrust - drag)*timeStep;
           car.position += car.velocity*timeStep;
@@ -161,6 +172,8 @@ public:
         glEnd();
         // Draw the car
         car.draw();
+        // Draw the ball
+        ball.draw();
 
         glDisable(GL_LIGHTING);
         // Draw the field borders, the pitch markings, and the goals here
