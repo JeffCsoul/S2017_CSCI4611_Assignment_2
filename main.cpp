@@ -78,28 +78,26 @@ public:
         vec2 dir = getControlDirection();
         if (dir.y == 0) {
           car.velocity = vec3(0, 0, 0);
-          // return;
+        } else {
+          if (glm::length(dir) > 0)
+          dir = glm::normalize(dir);
+          car.rotateRate += -dir.x * car.rotateFactor * timeStep;
+          vec3 thrust = car.thrustFactor *
+          vec3(-dir.y * sin(car.rotateRate * PI / 180),
+          0,
+          -dir.y * cos(car.rotateRate * PI / 180));
+          vec3 drag = car.dragFactor*car.velocity;
+          car.velocity += (thrust - drag)*timeStep;
+          car.position += car.velocity*timeStep;
+          if (car.position.x > 40 - car.collisionRadius ||
+            car.position.x < -40 + car.collisionRadius ||
+            car.position.z > 50 - car.collisionRadius ||
+            car.position.z < -50 + car.collisionRadius ) {
+              car.position -= car.velocity*timeStep;
+              car.velocity -= (thrust - drag)*timeStep;
+              car.rotateRate -= -dir.x * car.rotateFactor * timeStep;
+          }
         }
-        if (glm::length(dir) > 0)
-            dir = glm::normalize(dir);
-        // int temp_x = car.position.x - dir.y * sin(car.rotateRate -
-        //              dir.x * car.rotateFactor * timeStep * PI / 180);
-        // int temp_y = car.position.y - dir.y * cos(car.rotateRate -
-        //              dir.x * car.rotateFactor * timeStep * PI / 180);
-        // if (temp_x > 40 - car.collisionRadius ||
-        //     temp_x < -40 + car.collisionRadius ||
-        //     temp_y > 50 - car.collisionRadius ||
-        //     temp_y < -50 + car.collisionRadius)
-        //     return;
-        car.rotateRate += -dir.x * car.rotateFactor * timeStep;
-        vec3 thrust = car.thrustFactor *
-                      vec3(-dir.y * sin(car.rotateRate * PI / 180),
-                           0,
-                           -dir.y * cos(car.rotateRate * PI / 180));
-        vec3 drag = car.dragFactor*car.velocity;
-        car.velocity += (thrust - drag)*timeStep;
-        car.position += car.velocity*timeStep;
-
         // Handle ball/wall, car/wall, and ball/car collisions here
 
     }
