@@ -121,41 +121,41 @@ public:
           }
         }
         // Handle ball/wall, car/wall, and ball/car collisions here
+
+
         // ground
         if (ball.position.y <= 0 + ball.collisionRadius) {
           // hit ground
           ball.velocity.y = fabs(ball.velocity.y);
+          ball.position.y = 0 + ball.collisionRadius;
         }
         if (ball.position.y >= 35 - ball.collisionRadius) {
           // hit the upper wall
           ball.velocity.y = -fabs(ball.velocity.y);
+          ball.position.y = 35 - ball.collisionRadius;
         }
         if (ball.position.x <= -40 + ball.collisionRadius) {
           // hit the right wall
           ball.velocity.x *= fabs(ball.velocity.x);
+          ball.position.x = -40 + ball.collisionRadius;
         }
         if (ball.position.x >= 40 - ball.collisionRadius) {
           // hit the left wall
           ball.velocity.x *= -fabs(ball.velocity.x);
+          ball.position.x = 40 - ball.collisionRadius;
         }
         if (ball.position.z <= -50 + ball.collisionRadius) {
           ball.velocity.z *= fabs(ball.velocity.z);
+          ball.position.z = -50 + ball.collisionRadius;
         }
         if (ball.position.z >= 50 - ball.collisionRadius) {
           ball.velocity.z *= -fabs(ball.velocity.z);
+          ball.position.z = 50 - ball.collisionRadius;
         }
 
         // calculate out the position after this dt
         vec3 drag = ball.dragFactor * ball.velocity;
         ball.velocity += (ball.gravity - drag) * timeStep;
-        if (ball.position.y <= 0 + ball.collisionRadius) {
-          // hit ground
-          ball.velocity.y = fabs(ball.velocity.y);
-        }
-        if (ball.position.y >= 35 - ball.collisionRadius) {
-          // hit the upper wall
-          ball.velocity.y = -fabs(ball.velocity.y);
-        }
         ball.position += ball.velocity * timeStep;
     }
 
