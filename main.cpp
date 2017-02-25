@@ -20,14 +20,7 @@ public:
         // Replace the following with a more car-like geometry
         glPushMatrix();
         glTranslatef(position.x,position.y,position.z);
-        glTranslatef(0,
-                     0,
-                     2);
         glRotatef(rotateRate, 0, 1, 0);
-        glTranslatef(0,
-                     0,
-                     -2);
-        // glTranslatef(position.x,position.y,position.z);
         glScalef(3, 2, 4);
         Draw::unitCube();
         // glVertex3f(position.x,position.y,position.z);
