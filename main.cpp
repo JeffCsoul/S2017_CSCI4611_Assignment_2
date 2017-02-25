@@ -25,7 +25,6 @@ public:
         Draw::unitCube();
         // glVertex3f(position.x,position.y,position.z);
         glPopMatrix();
-        glEnd();
     }
 };
 
@@ -34,6 +33,12 @@ class Ball {
    vec3 position;
    vec3 velocity;
 
+   void draw() {
+     glColor3f(1,1,1);
+     glPushMatrix();
+     glTranslatef(position.x, position.y,position.z);
+     glPopMatrix();
+   }
 };
 
 class CarSoccer: public Engine {
@@ -70,7 +75,17 @@ public:
         // An oversimplified dynamics model for the car
         vec2 dir = getControlDirection();
         if (dir.y == 0) {
-          car.velocity = vec3(0, 0, 0);
+          vec3 drag = car.dragFactor*car.velocity;
+          car.velocity -= drag * timeStep;
+          car.position += car.velocity*timeStep;
+          if (car.position.x > 40 - car.collisionRadius ||
+            car.position.x < -40 + car.collisionRadius ||
+            car.position.z > 50 - car.collisionRadius ||
+            car.position.z < -50 + car.collisionRadius ) {
+              // hit the wall. stop and recover the position
+              car.position -= car.velocity*timeStep;
+              car.velocity = vec3(0,0,0);
+          }
         } else {
           if (glm::length(dir) > 0)
           dir = glm::normalize(dir);
@@ -86,8 +101,9 @@ public:
             car.position.x < -40 + car.collisionRadius ||
             car.position.z > 50 - car.collisionRadius ||
             car.position.z < -50 + car.collisionRadius ) {
+              // hit the wall, stop and recover the position and rotate angle
               car.position -= car.velocity*timeStep;
-              car.velocity -= (thrust - drag)*timeStep;
+              car.velocity = vec3(0,0,0);
               car.rotateRate -= -dir.x * car.rotateFactor * timeStep;
           }
         }
