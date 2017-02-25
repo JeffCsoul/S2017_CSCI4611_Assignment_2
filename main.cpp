@@ -54,8 +54,8 @@ public:
         car.position = vec3(0, 1, 45); // center of car is 1 m above ground
         car.velocity = vec3(0, 0, 0);
         car.rotateRate = 0.0;
-        car.thrustFactor = 300;
-        car.rotateFactor = 180;
+        car.thrustFactor = 250;
+        car.rotateFactor = 210;
         car.dragFactor = 5;
     }
 
@@ -82,6 +82,15 @@ public:
         }
         if (glm::length(dir) > 0)
             dir = glm::normalize(dir);
+        // int temp_x = car.position.x - dir.y * sin(car.rotateRate -
+        //              dir.x * car.rotateFactor * timeStep * PI / 180);
+        // int temp_y = car.position.y - dir.y * cos(car.rotateRate -
+        //              dir.x * car.rotateFactor * timeStep * PI / 180);
+        // if (temp_x > 40 - car.collisionRadius ||
+        //     temp_x < -40 + car.collisionRadius ||
+        //     temp_y > 50 - car.collisionRadius ||
+        //     temp_y < -50 + car.collisionRadius)
+        //     return;
         car.rotateRate += -dir.x * car.rotateFactor * timeStep;
         vec3 thrust = car.thrustFactor *
                       vec3(-dir.y * sin(car.rotateRate * PI / 180),
@@ -148,6 +157,79 @@ public:
 
         glDisable(GL_LIGHTING);
         // Draw the field borders, the pitch markings, and the goals here
+        glColor3f(1,1,1);
+        glBegin(GL_LINE_STRIP);
+        glVertex3f(+40,0,+50);
+        glVertex3f(-40,0,+50);
+        glVertex3f(-40,0,-50);
+        glVertex3f(+40,0,-50);
+        glVertex3f(+40,0,+50);
+
+        glVertex3f(+40,+35,+50);
+        glVertex3f(-40,+35,+50);
+        glVertex3f(-40,+35,-50);
+        glVertex3f(+40,+35,-50);
+        glVertex3f(+40,+35,+50);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex3f(-40,0,+50);
+        glVertex3f(-40,+35,+50);
+
+        glVertex3f(-40,0,-50);
+        glVertex3f(-40,+35,-50);
+
+        glVertex3f(+40,0,-50);
+        glVertex3f(+40,+35,-50);
+
+        glVertex3f(+40,0,0);
+        glVertex3f(-40,0,0);
+
+        glVertex3f(+20,0,+50);
+        glVertex3f(+20,0,+35);
+
+        glVertex3f(+20,0,+35);
+        glVertex3f(-20,0,+35);
+
+        glVertex3f(-20,0,+35);
+        glVertex3f(-20,0,+50);
+
+        glVertex3f(+20,0,-50);
+        glVertex3f(+20,0,-35);
+
+        glVertex3f(+20,0,-35);
+        glVertex3f(-20,0,-35);
+
+        glVertex3f(-20,0,-35);
+        glVertex3f(-20,0,-50);
+        glEnd();
+
+        Draw::circleXZ(10);
+
+        glColor3f(0,0.5,1);
+        for (int x = -10; x < 10; x++) {
+          for (int y = 0; y < 10; y++) {
+            glBegin(GL_LINE_LOOP);
+            glVertex3f(x, y, -50);
+            glVertex3f(x+1, y, -50);
+            glVertex3f(x+1, y+1, -50);
+            glVertex3f(x, y+1, -50);
+            glEnd();
+          }
+        }
+
+        glColor3f(1,0.5,0);
+        for (int x = -10; x < 10; x++) {
+          for (int y = 0; y < 10; y++) {
+            glBegin(GL_LINE_LOOP);
+            glVertex3f(x, y, 50);
+            glVertex3f(x+1, y, 50);
+            glVertex3f(x+1, y+1, 50);
+            glVertex3f(x, y+1, 50);
+            glEnd();
+          }
+        }
+
         glEnable(GL_LIGHTING);
 
         // Draw the ball

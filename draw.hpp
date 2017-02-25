@@ -76,6 +76,14 @@ namespace Draw {
         gluSphere(quadric, 1, 40, 40);
     }
 
+    void circleXZ(float r) {
+        glBegin(GL_LINE_LOOP);
+        for (int i = 0; i < 30; i++) {
+            float t = 2*M_PI*i/30;
+            glVertex3f(r*cos(t),0,r*sin(t));
+        }
+        glEnd();
+    }
 }
 
 #endif
