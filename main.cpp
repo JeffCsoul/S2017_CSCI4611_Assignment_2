@@ -53,6 +53,8 @@ public:
     Car car;
     Ball ball;
     CarSoccer() {
+        srand((unsigned)time(0));
+        double sd = (rand() % 101) / 100.0 * M_PI;
         window = createWindow("Car Soccer", 1280, 720);
         car.collisionRadius = 2.5;
         car.position = vec3(0, 1, 45); // center of car is 1 m above ground
@@ -62,12 +64,11 @@ public:
         car.rotateFactor = 210;
         car.dragFactor = 5;
 
-        srand((unsigned)time(0));
-        ball.position = vec3(0, 20, 0);
-        ball.velocity = vec3(0, 0, 0);
+        ball.position = vec3(0, 2, 0);
+        ball.velocity = vec3(25 * cos(sd), 10, 25 * sin(sd));
         ball.gravity = vec3(0, -200, 0);
         ball.collisionRadius = 2;
-        ball.dragFactor = 0.5;
+        ball.dragFactor = 0.2;
     }
 
     ~CarSoccer() {
@@ -85,6 +86,20 @@ public:
     }
 
     void simulate(float timeStep) {
+        // consider whether the ball reaches the goal
+        if ((ball.position.z <= -50 + ball.collisionRadius ||
+            ball.position.z >= 50 - ball.collisionRadius) && (
+            ball.position.x >= -10 + ball.collisionRadius &&
+            ball.position.x <= 10 - ball.collisionRadius &&
+            ball.position.y <= 10 - ball.collisionRadius) ) {
+          double sd = (rand() % 101) / 100.0 * M_PI;
+          car.position = vec3(0, 1, 45); // center of car is 1 m above ground
+          car.velocity = vec3(0, 0, 0);
+          car.rotateRate = 0.0;
+
+          ball.position = vec3(0, 2, 0);
+          ball.velocity = vec3(25 * cos(sd), 10, 25 * sin(sd));
+        }
         // An oversimplified dynamics model for the car
         vec2 dir = getControlDirection();
         if (dir.y == 0) {
@@ -122,40 +137,49 @@ public:
         }
         // Handle ball/wall, car/wall, and ball/car collisions here
 
-
         // ground
-        if (ball.position.y <= 0 + ball.collisionRadius) {
+        if (ball.position.y < 0 + ball.collisionRadius) {
           // hit ground
           ball.velocity.y = fabs(ball.velocity.y);
           ball.position.y = 0 + ball.collisionRadius;
         }
-        if (ball.position.y >= 35 - ball.collisionRadius) {
+        if (ball.position.y > 35 - ball.collisionRadius) {
           // hit the upper wall
           ball.velocity.y = -fabs(ball.velocity.y);
           ball.position.y = 35 - ball.collisionRadius;
         }
-        if (ball.position.x <= -40 + ball.collisionRadius) {
+        if (ball.position.x < -40 + ball.collisionRadius) {
           // hit the right wall
-          ball.velocity.x *= fabs(ball.velocity.x);
+          ball.velocity.x = fabs(ball.velocity.x);
           ball.position.x = -40 + ball.collisionRadius;
         }
-        if (ball.position.x >= 40 - ball.collisionRadius) {
+        if (ball.position.x > 40 - ball.collisionRadius) {
           // hit the left wall
-          ball.velocity.x *= -fabs(ball.velocity.x);
+          ball.velocity.x = -fabs(ball.velocity.x);
           ball.position.x = 40 - ball.collisionRadius;
         }
-        if (ball.position.z <= -50 + ball.collisionRadius) {
-          ball.velocity.z *= fabs(ball.velocity.z);
+        if (ball.position.z < -50 + ball.collisionRadius) {
+          ball.velocity.z = fabs(ball.velocity.z);
           ball.position.z = -50 + ball.collisionRadius;
         }
-        if (ball.position.z >= 50 - ball.collisionRadius) {
-          ball.velocity.z *= -fabs(ball.velocity.z);
+        if (ball.position.z > 50 - ball.collisionRadius) {
+          ball.velocity.z = -fabs(ball.velocity.z);
           ball.position.z = 50 - ball.collisionRadius;
         }
 
         // calculate out the position after this dt
         vec3 drag = ball.dragFactor * ball.velocity;
         ball.velocity += (ball.gravity - drag) * timeStep;
+        vec3 dis_ball_car = ball.position - car.position;
+        if (glm::length(dis_ball_car) <=
+            ball.collisionRadius + car.collisionRadius) {
+          ball.position = car.position +
+                          (ball.collisionRadius + car.collisionRadius) *
+                          glm::normalize(dis_ball_car);
+          vec3 rel_v = ball.velocity - car.velocity;
+          ball.velocity += glm::length(rel_v) * glm::normalize(dis_ball_car);
+        }
+
         ball.position += ball.velocity * timeStep;
     }
 
@@ -300,6 +324,15 @@ public:
         // to the center of the pitch and give it a "kick-off" velocity.
         // We found that a nice initial velocity is (25 cos(a), 10, 25 sin(a))
         // where a is a random number between 0 and pi.
+        if (e.keysym.scancode == SDL_SCANCODE_SPACE) {
+          double sd = (rand() % 101) / 100.0 * M_PI;
+          car.position = vec3(0, 1, 45); // center of car is 1 m above ground
+          car.velocity = vec3(0, 0, 0);
+          car.rotateRate = 0.0;
+
+          ball.position = vec3(0, 2, 0);
+          ball.velocity = vec3(25 * cos(sd), 10, 25 * sin(sd));
+        }
 
     }
 };
