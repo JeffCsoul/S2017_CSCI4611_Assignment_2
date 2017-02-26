@@ -65,7 +65,7 @@ public:
         car.dragFactor = 5;
 
         ball.position = vec3(0, 2, 0);
-        ball.velocity = vec3(25 * cos(sd), 10, 25 * sin(sd));
+        ball.velocity = vec3(25 * cos(sd), 50, 25 * sin(sd));
         ball.gravity = vec3(0, -200, 0);
         ball.collisionRadius = 2;
         ball.dragFactor = 0.2;
@@ -98,7 +98,7 @@ public:
           car.rotateRate = 0.0;
 
           ball.position = vec3(0, 2, 0);
-          ball.velocity = vec3(25 * cos(sd), 10, 25 * sin(sd));
+          ball.velocity = vec3(25 * cos(sd), 50, 25 * sin(sd));
         }
         // An oversimplified dynamics model for the car
         vec2 dir = getControlDirection();
@@ -170,6 +170,8 @@ public:
         // calculate out the position after this dt
         vec3 drag = ball.dragFactor * ball.velocity;
         ball.velocity += (ball.gravity - drag) * timeStep;
+
+        // car and ball
         vec3 dis_ball_car = ball.position - car.position;
         if (glm::length(dis_ball_car) <=
             ball.collisionRadius + car.collisionRadius) {
@@ -233,8 +235,6 @@ public:
         glEnd();
         // Draw the car
         car.draw();
-        // Draw the ball
-        ball.draw();
 
         glDisable(GL_LIGHTING);
         // Draw the field borders, the pitch markings, and the goals here
@@ -314,7 +314,7 @@ public:
         glEnable(GL_LIGHTING);
 
         // Draw the ball
-
+        ball.draw();
         SDL_GL_SwapWindow(window);
     }
 
@@ -331,7 +331,7 @@ public:
           car.rotateRate = 0.0;
 
           ball.position = vec3(0, 2, 0);
-          ball.velocity = vec3(25 * cos(sd), 10, 25 * sin(sd));
+          ball.velocity = vec3(25 * cos(sd), 50, 25 * sin(sd));
         }
 
     }
