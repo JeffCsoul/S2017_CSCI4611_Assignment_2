@@ -20,4 +20,5 @@ You can find a executive program which is named `CarSoccer` in the folder the so
 2. I used fabs() function to help determine the current direction for balls' bounce in order to prevent unexpected movement.
 3. I designed two drawing helper function to make draw the figures much easier.
 4. I used sin and cos function to help determine the accelerate velocity's direction for the car. I also baned the moving functionality of car when the user just presses the left or right button. The car mush be controlled by forward and back button with or without left/right button. This design pattern can help the car in our game act like a real car.
-5. I used the equipment provided by the handout pdf to determine the accelerate velocity for the ball. 
+5. I used the equipment provided by the handout pdf to determine the accelerate velocity for the ball.
+6. I reduced the area which would consider that the ball hits the goal by the collision size of ball. It would be more realistic since we consider the ball hits the goal when and only when the whole ball is in the specified area.
